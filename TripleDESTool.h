@@ -24,6 +24,11 @@
 /**
  * @brief  - 將 NSData 解密成 NSString
  */
--(NSString *)decryptWithNSString:(NSData *)encryptData;
+-(NSString *)decryptToStringWithData:(NSData *)encryptData;
+
+/**
+ * @brief - Create Triple DES Key
+ */
+-(NSData*)create3DesKey;
 
 @end

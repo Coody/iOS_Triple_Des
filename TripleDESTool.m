@@ -4,7 +4,7 @@
 
 #import "TripleDESTool.h"
 
-//// for Triple DES
+// for Triple DES
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 
@@ -38,7 +38,6 @@
 
 -(void) setKey:(NSString *) keyString
 {
-    // 轉成資料
     NSData* myKeyValue = [keyString dataUsingEncoding:NSUTF8StringEncoding];
     _encryptKeyValue = [myKeyValue bytes];
 }
@@ -52,14 +51,16 @@
     }
     else{
         
+        NSMutableData *fillData = [NSMutableData dataWithData:originalData];
+        
         size_t bufferSize = originalData.length + kCCBlockSize3DES;
         NSMutableData *cypherData = [NSMutableData dataWithLength:bufferSize];
         size_t movedBytes = 0;
         
         CCCryptorStatus ccStatus;
-        ccStatus = CCCrypt(kCCDecrypt,
+        ccStatus = CCCrypt(kCCEncrypt,
                            kCCAlgorithm3DES,
-                           kCCOptionECBMode,
+                           kCCOptionPKCS7Padding,/* 如果用 kCCOptionECBMode 則不是 8 byte 會有問題，詳細請看 https://stackoverflow.com/questions/9911899/encryption-in-iphone-with-3des */
                            _encryptKeyValue,
                            kCCKeySize3DES,
                            NULL,
@@ -93,9 +94,9 @@
         size_t movedBytes = 0;
         
         CCCryptorStatus ccStatus;
-        ccStatus = CCCrypt(kCCEncrypt,
+        ccStatus = CCCrypt(kCCDecrypt,
                            kCCAlgorithm3DES,
-                           kCCOptionECBMode,
+                           kCCOptionPKCS7Padding,
                            _encryptKeyValue,
                            kCCKeySize3DES,
                            NULL,
@@ -124,10 +125,33 @@
     return encryptData;
 }
 
--(NSString *)decryptWithNSString:(NSData *)encryptData{
+-(NSString *)decryptToStringWithData:(NSData *)encryptData{
     NSData *decryptData = [self decryptWithData:encryptData];
     NSString *decryptString = [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
     return decryptString;
+}
+
+#pragma mark - Create Key
+-(NSData*)create3DesKey
+{
+    NSMutableData *mData = [[NSMutableData alloc] init];
+    NSMutableData *mAuxData = [[NSMutableData alloc] init];
+    
+    for(int i = 0; i < 16; ++i)
+    {
+        u_int32_t aux = arc4random() % 255;
+        
+        [mData appendBytes:&aux length:1];
+        
+        if(i < 8)
+        {
+            [mAuxData appendBytes:&aux length:1];
+        }
+    }
+    
+    [mData appendData:mAuxData];
+    
+    return mData;
 }
 
 @end
