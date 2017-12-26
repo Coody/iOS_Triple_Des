@@ -10,12 +10,13 @@
 
 -(void)setKey:(NSString *) keyString;
 
-#pragma mark - Send NSData and receive NSData
+#pragma mark - Encrypt amd Decrypt
+#pragma mark : Send NSData and receive NSData
 -(NSData *)encrpytWithData:(NSData *)originalData;
 
 -(NSData *)decryptWithData:(NSData *)encryptData;
 
-#pragma nark -
+#pragma mark :
 /**
  * @brief  - 將 NSString 加密成 NSData
  */
@@ -26,9 +27,12 @@
  */
 -(NSString *)decryptToStringWithData:(NSData *)encryptData;
 
+#pragma mark - Other tools
 /**
  * @brief - Create Triple DES Key
  */
 -(NSData*)create3DesKey;
+
+-(NSData *)getBase64Data:(NSData *)originalData;
 
 @end

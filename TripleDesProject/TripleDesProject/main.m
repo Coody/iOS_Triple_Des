@@ -23,21 +23,22 @@ int main(int argc, const char * argv[]) {
             NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithData:data];
             
             NSLog(@"EncrpytData = %@" , encryptData);
+            NSLog(@"Encrpyt base64 Data = %@" , [[TripleDESTool sharedInstance] getBase64Data:encryptData] );
             
             NSData *decryptData = [[TripleDESTool sharedInstance] decryptWithData:encryptData];
             NSString *decryptString = [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
             NSLog(@"DecryptString = %@" , decryptString);
         }
         
-//        // NSString -> NSData && NSData -> NSString
-//        {
-//            NSString *testString = @"Test Triple DES project!(NSString -> NSData)";
-//            NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithString:testString];
-//            NSLog(@"EncrpytData = %@" , encryptData);
-//
-//            NSString *decryptString = [[TripleDESTool sharedInstance] decryptToStringWithData:encryptData];
-//            NSLog(@"DecryptString = %@" , decryptString);
-//        }
+        // NSString -> NSData && NSData -> NSString
+        {
+            NSString *testString = @"Test Triple DES project!(NSString -> NSData)";
+            NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithString:testString];
+            NSLog(@"EncrpytData = %@" , encryptData);
+
+            NSString *decryptString = [[TripleDESTool sharedInstance] decryptToStringWithData:encryptData];
+            NSLog(@"DecryptString = %@" , decryptString);
+        }
     }
     return 0;
 }

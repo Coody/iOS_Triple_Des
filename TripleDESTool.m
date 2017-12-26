@@ -154,4 +154,8 @@
     return mData;
 }
 
+-(NSData *)getBase64Data:(NSData *)originalData{
+    return [originalData base64EncodedDataWithOptions:0];
+}
+
 @end
