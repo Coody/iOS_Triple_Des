@@ -39,5 +39,5 @@ NSString *decryptString = [[TripleDESTool sharedInstance] decryptToStringWithDat
 ```
 
 # License
-MIT 請自由取用
+[MIT](https://zh.wikipedia.org/wiki/MIT許可證) 請自由取用
 
