@@ -15,14 +15,16 @@ int main(int argc, const char * argv[]) {
         // insert code here...
         NSLog(@"Test Triple DES");
         
-        [[TripleDESTool sharedInstance] setKey:@"testtes"];
+        [[TripleDESTool sharedInstance] setKey:@"testtest"];
         
         // NSData -> NSData
         {
-            NSData *data = [@"test123" dataUsingEncoding:NSUTF8StringEncoding];
+            NSData *data = [@"test" dataUsingEncoding:NSUTF8StringEncoding];
             NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithData:data];
             
-            NSLog(@"EncrpytData = %@" , encryptData);
+            NSString* newStr = [[NSString alloc] initWithData:[[TripleDESTool sharedInstance] getBase64Data:encryptData] encoding:NSUTF8StringEncoding];
+            NSLog(@"EncrpytData = %@" , newStr);
+            
             NSLog(@"Encrpyt base64 Data = %@" , [[TripleDESTool sharedInstance] getBase64Data:encryptData] );
             
             NSData *decryptData = [[TripleDESTool sharedInstance] decryptWithData:encryptData];
@@ -30,15 +32,15 @@ int main(int argc, const char * argv[]) {
             NSLog(@"DecryptString = %@" , decryptString);
         }
         
-        // NSString -> NSData && NSData -> NSString
-        {
-            NSString *testString = @"Test Triple DES project!(NSString -> NSData)";
-            NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithString:testString];
-            NSLog(@"EncrpytData = %@" , encryptData);
-
-            NSString *decryptString = [[TripleDESTool sharedInstance] decryptToStringWithData:encryptData];
-            NSLog(@"DecryptString = %@" , decryptString);
-        }
+//        // NSString -> NSData && NSData -> NSString
+//        {
+//            NSString *testString = @"Test Triple DES project!(NSString -> NSData)";
+//            NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithString:testString];
+//            NSLog(@"EncrpytData = %@" , encryptData);
+//
+//            NSString *decryptString = [[TripleDESTool sharedInstance] decryptToStringWithData:encryptData];
+//            NSLog(@"DecryptString = %@" , decryptString);
+//        }
     }
     return 0;
 }

@@ -38,8 +38,8 @@
 
 -(void) setKey:(NSString *) keyString
 {
-    NSData* myKeyValue = [keyString dataUsingEncoding:NSUTF8StringEncoding];
-    _encryptKeyValue = [myKeyValue bytes];
+//    NSData* myKeyValue = [keyString dataUsingEncoding:NSUTF8StringEncoding];
+    _encryptKeyValue = CFBridgingRetain(keyString);
 }
 
 #pragma marl - Public Methods
@@ -52,20 +52,25 @@
     else{
         
         NSMutableData *fillData = [NSMutableData dataWithData:originalData];
+//        while( fillData.length %8 != 0 ){
+//            [fillData appendData:0];
+//            [fillData increaseLengthBy:1];
+//        }
         
-        size_t bufferSize = originalData.length + kCCBlockSize3DES;
+        
+        size_t bufferSize = fillData.length + kCCBlockSize3DES;
         NSMutableData *cypherData = [NSMutableData dataWithLength:bufferSize];
         size_t movedBytes = 0;
         
         CCCryptorStatus ccStatus;
         ccStatus = CCCrypt(kCCEncrypt,
                            kCCAlgorithm3DES,
-                           kCCOptionPKCS7Padding,/* 如果用 kCCOptionECBMode 則不是 8 byte 會有問題，詳細請看 https://stackoverflow.com/questions/9911899/encryption-in-iphone-with-3des */
+                           kCCOptionPKCS7Padding | kCCOptionECBMode,/* 如果用 kCCOptionECBMode 則不是 8 byte 會有問題，詳細請看 https://stackoverflow.com/questions/9911899/encryption-in-iphone-with-3des */
                            _encryptKeyValue,
                            kCCKeySize3DES,
                            NULL,
-                           originalData.bytes,
-                           originalData.length,
+                           fillData.bytes,
+                           fillData.length,
                            cypherData.mutableBytes,
                            cypherData.length,
                            &movedBytes);
@@ -73,7 +78,7 @@
         cypherData.length = movedBytes;
         
         if( ccStatus == kCCSuccess ){
-            encryptData = [cypherData copy];
+            encryptData = cypherData;
         }
         else{
             NSLog(@"Encrypto Fail!!");
@@ -155,7 +160,7 @@
 }
 
 -(NSData *)getBase64Data:(NSData *)originalData{
-    return [originalData base64EncodedDataWithOptions:0];
+    return [originalData base64EncodedDataWithOptions:NSDataBase64Encoding64CharacterLineLength];
 }
 
 @end
