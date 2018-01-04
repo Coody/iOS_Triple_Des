@@ -8,7 +8,7 @@
 
 +(instancetype)sharedInstance;
 
--(void)setKey:(NSString *) keyString;
+-(BOOL)setKey:(NSString *) keyString;
 
 #pragma mark - Encrypt amd Decrypt
 #pragma mark : Send NSData and receive NSData
@@ -34,5 +34,7 @@
 -(NSData*)create3DesKey;
 
 -(NSData *)getBase64Data:(NSData *)originalData;
+
+-(NSData *)getBase64StringToData:(NSString *)originalString;
 
 @end

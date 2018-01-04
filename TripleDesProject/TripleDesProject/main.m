@@ -5,9 +5,12 @@
 //  Created by CoodyChou on 2017/12/22.
 //  Copyright © 2017年 CoodyChou. All rights reserved.
 //
+//  Online encrypt tool:
+//  https://www.tools4noobs.com/online_tools/encrypt/
+//  Online decrypt tool:
+//  https://www.tools4noobs.com/online_tools/decrypt/
 
 #import <Foundation/Foundation.h>
-
 #import "TripleDESTool.h"
 
 int main(int argc, const char * argv[]) {
@@ -15,24 +18,35 @@ int main(int argc, const char * argv[]) {
         // insert code here...
         NSLog(@"Test Triple DES");
         
-        [[TripleDESTool sharedInstance] setKey:@"testtes"];
-        
+        if([[TripleDESTool sharedInstance] setKey:@"testtesttesttesttesttest"])
         // NSData -> NSData
         {
-            NSData *data = [@"test123" dataUsingEncoding:NSUTF8StringEncoding];
+
+            NSString *testString = @"testtest";
+            NSData *data = [testString dataUsingEncoding:NSUTF8StringEncoding];
             NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithData:data];
-            
             NSLog(@"EncrpytData = %@" , encryptData);
-            NSLog(@"Encrpyt base64 Data = %@" , [[TripleDESTool sharedInstance] getBase64Data:encryptData] );
             
-            NSData *decryptData = [[TripleDESTool sharedInstance] decryptWithData:encryptData];
+            NSLog(@"EncrpytData to base64 Data = %@" , [[TripleDESTool sharedInstance] getBase64Data:encryptData] );
+            
+            NSString* newStr = [[NSString alloc] initWithData:[[TripleDESTool sharedInstance] getBase64Data:encryptData] encoding:NSUTF8StringEncoding];
+            NSLog(@"EncrpytData to Base64 String = %@" , newStr);
+            
+            NSData * base64StrToData = [[TripleDESTool sharedInstance] getBase64StringToData:newStr];
+            NSLog(@"Encrpyt base64 String to EncrpytData= %@" , base64StrToData);
+            
+            NSData *decryptData = [[TripleDESTool sharedInstance] decryptWithData:base64StrToData];
+            
             NSString *decryptString = [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
             NSLog(@"DecryptString = %@" , decryptString);
+        }else
+        {
+            NSLog(@"the Key an invalid size");
         }
         
         // NSString -> NSData && NSData -> NSString
         {
-            NSString *testString = @"Test Triple DES project!(NSString -> NSData)";
+            NSString *testString = @"testtest";
             NSData *encryptData = [[TripleDESTool sharedInstance] encrpytWithString:testString];
             NSLog(@"EncrpytData = %@" , encryptData);
 
