@@ -10,7 +10,9 @@
 
 @interface TripleDESTool()
 {
-    const void *_encryptKeyValue;
+    //const void *_encryptKeyValue;
+    //NSString *key;
+    NSMutableData *keyData;
 }
 @end
 
@@ -36,10 +38,37 @@
     return self;
 }
 
--(void) setKey:(NSString *) keyString
+-(BOOL) setKey:(NSString *) keyString
 {
-    NSData* myKeyValue = [keyString dataUsingEncoding:NSUTF8StringEncoding];
-    _encryptKeyValue = [myKeyValue bytes];
+    NSData* myKeyValue = [[keyString copy] dataUsingEncoding:NSUTF8StringEncoding];
+    //_encryptKeyValue = CFBridgingRetain(keyString);
+    //key = [keyString copy];
+    
+    keyData = [NSMutableData dataWithData:myKeyValue];
+    
+    NSLog(@"the Key is an size %ld", keyData.length);
+    
+    if(keyData.length != kCCKeySize3DES)
+    {
+        return NO;
+    }
+    
+    return YES;
+//    if(keyData.length > kCCKeySize3DES)
+//    {
+//        //keyData.length = kCCKeySize3DES;
+//        [keyData replaceBytesInRange:NSMakeRange(0, kCCKeySize3DES)
+//                           withBytes:keyData.bytes];
+//    }
+//    else
+//    {
+//        while ((keyData.length) % kCCKeySize3DES != 0) {
+//            [keyData appendData:0x00];
+//            [keyData increaseLengthBy:1];
+//        }
+//    }
+    
+//    NSAssert(keyData.length == kCCKeySize3DES , @"the keyData is an invalid size");
 }
 
 #pragma marl - Public Methods
@@ -53,19 +82,26 @@
         
         NSMutableData *fillData = [NSMutableData dataWithData:originalData];
         
-        size_t bufferSize = originalData.length + kCCBlockSize3DES;
+        while( fillData.length % 8 != 0 ){
+            [fillData appendData:0x00];
+            [fillData increaseLengthBy:1];
+        }
+        
+        size_t bufferSize = fillData.length + kCCBlockSize3DES;
         NSMutableData *cypherData = [NSMutableData dataWithLength:bufferSize];
         size_t movedBytes = 0;
+        
+
         
         CCCryptorStatus ccStatus;
         ccStatus = CCCrypt(kCCEncrypt,
                            kCCAlgorithm3DES,
-                           kCCOptionPKCS7Padding,/* 如果用 kCCOptionECBMode 則不是 8 byte 會有問題，詳細請看 https://stackoverflow.com/questions/9911899/encryption-in-iphone-with-3des */
-                           _encryptKeyValue,
-                           kCCKeySize3DES,
+                           kCCOptionECBMode,/* 如果用 kCCOptionECBMode 則不是 8 byte 會有問題，詳細請看 https://stackoverflow.com/questions/9911899/encryption-in-iphone-with-3des */
+                           keyData.bytes,
+                           keyData.length,
                            NULL,
-                           originalData.bytes,
-                           originalData.length,
+                           fillData.bytes,
+                           fillData.length,
                            cypherData.mutableBytes,
                            cypherData.length,
                            &movedBytes);
@@ -73,7 +109,7 @@
         cypherData.length = movedBytes;
         
         if( ccStatus == kCCSuccess ){
-            encryptData = [cypherData copy];
+            encryptData = cypherData;
         }
         else{
             NSLog(@"Encrypto Fail!!");
@@ -96,9 +132,9 @@
         CCCryptorStatus ccStatus;
         ccStatus = CCCrypt(kCCDecrypt,
                            kCCAlgorithm3DES,
-                           kCCOptionPKCS7Padding,
-                           _encryptKeyValue,
-                           kCCKeySize3DES,
+                           kCCOptionECBMode,
+                           keyData.bytes,
+                           keyData.length,
                            NULL,
                            encryptData.bytes,
                            encryptData.length,
@@ -155,7 +191,11 @@
 }
 
 -(NSData *)getBase64Data:(NSData *)originalData{
-    return [originalData base64EncodedDataWithOptions:0];
+    return [originalData base64EncodedDataWithOptions:NSDataBase64Encoding64CharacterLineLength];
+}
+
+-(NSData *)getBase64StringToData:(NSString *)originalString{
+    return [[NSData alloc] initWithBase64EncodedString:originalString options:NSDataBase64DecodingIgnoreUnknownCharacters];
 }
 
 @end
