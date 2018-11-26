@@ -50,7 +50,12 @@
     
     if(keyData.length != kCCKeySize3DES)
     {
+#ifdef DEBUG
+        NSAssert( 0 , @"Key is valid!!!! 3DES key MUST be length %d ( Your key length : %lu ) !!! ( Crash in DEBUG=1. )" , kCCKeySize3DES , (unsigned long)keyData.length );
         return NO;
+#else
+        return NO;
+#endif
     }
     
     return YES;
