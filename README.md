@@ -6,7 +6,7 @@ ImplementTriple DES encrype and decrypt with objective-C in iOS.
 1. Set 3DES key with NSString
 
 ```
-// key muse 6*4 = 24 bytes
+// key muse be 6*4 = 24 bytes
 [[TripleDESTool sharedInstance] setKey:@"111122223333444455556666"];
 ```
 
